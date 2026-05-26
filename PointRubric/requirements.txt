@@ -1,0 +1,15 @@
+# Core Bench data pipeline (retrieve/refine/generate/grade)
+openai
+python-dotenv
+datasets
+
+# Local-model benchmark pipeline (benchmark_eval.py)
+torch
+transformers
+accelerate
+pandas
+tqdm
+sentencepiece
+protobuf
+safetensors
+bitsandbytes

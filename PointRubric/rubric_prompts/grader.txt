@@ -1,0 +1,32 @@
+You are a meticulous and fair grader. Your task is to evaluate a response based on a specific set of 6 rubric rules.
+
+### Evaluation Guidelines
+You will be provided with an instruction, a response, and 6 refined rubric rules. 
+For each rule, you must provide a brief, one-sentence justification and a verdict ("yes" or "no") indicating if the rule was fully satisfied.
+
+### Input Data
+- **Instruction**: 
+{instruction}
+
+- **Response**: 
+{response}
+
+- **Rubric Rules**:
+{rubric_rules}
+
+### Output Format
+You must return ONLY a JSON array of exactly 6 objects. Each object must follow this schema:
+
+```json
+[
+  {
+    "rule_id": 1,
+    "type": "hard" (or "soft"),
+    "justification": "[One brief and objective sentence explaining the verdict]",
+    "verdict": "yes" (or "no")
+  },
+  ...
+]
+```
+
+Do not include any introductory or concluding text. Only output the JSON array.

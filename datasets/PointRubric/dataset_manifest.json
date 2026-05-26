@@ -1,0 +1,39 @@
+{
+  "dataset_name": "PointRubric / OpenRubricBench",
+  "role_in_paper": "Pointwise rubric-judge benchmark for static and tuned evaluator experiments.",
+  "source_dataset": {
+    "name": "OpenRubrics/OpenRubric-v2",
+    "split": "train",
+    "loader_script": "PointRubric/scripts/retrieve_data.py",
+    "fallback_dataset_in_loader": "OpenRubrics/OpenRubrics"
+  },
+  "released_files": {
+    "full_benchmark": "PointRubric/data/bench.json",
+    "fixed_split_dir": "PointRubric/data/fixed_split_seed42_train40_dev10_test50/"
+  },
+  "construction_summary": [
+    "Merge the two local construction passes 4o-v1 and 4o-v2.",
+    "Keep problems where answer1.total_score == 10.",
+    "Keep problems where answer2.total_score <= 3.",
+    "Keep problems with at least one answer score in [2, 8].",
+    "Deduplicate by question_id with one record per problem."
+  ],
+  "counts": {
+    "full_questions": 1042,
+    "full_answer_instances": 4168,
+    "split_seed": 42,
+    "train_questions": 417,
+    "dev_questions": 104,
+    "test_questions": 521,
+    "train_answer_instances": 1668,
+    "dev_answer_instances": 416,
+    "test_answer_instances": 2084
+  },
+  "sha256": {
+    "PointRubric/data/bench.json": "9185c13a12e56ccc0030dfa04efa7ddc7804d37d3ac576abf7a053428991f188",
+    "PointRubric/data/fixed_split_seed42_train40_dev10_test50/train.json": "5274e3724aea19886b9fcf28770c08ece460c6441b6ce17a13286d6731ab3ea8",
+    "PointRubric/data/fixed_split_seed42_train40_dev10_test50/dev.json": "d0fe60db9add0fca99b5353b0b66ec84ad84ffef3f6d5d838ab8fa8b59b4cc1c",
+    "PointRubric/data/fixed_split_seed42_train40_dev10_test50/test.json": "c4164e7e5372d7d80788448a6dd59b1c92e9a055b7f50f7350229050dd36d081",
+    "PointRubric/data/fixed_split_seed42_train40_dev10_test50/manifest.json": "45e6efc4674abfa9b242e732d06ea862517c1a45b5afd8dfbc4e2ecf710bac03"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "dataset_name": "RaR-Science-Static",
+  "role_in_paper": "External transfer/static evaluator benchmark using RaR-Science rubric data.",
+  "source_dataset": {
+    "name": "anisha2102/RaR-Science",
+    "source": "Hugging Face Datasets",
+    "conversion_script_in_working_tree": "rubric/data/prepare_data.py",
+    "local_converted_files_expected_by_scripts": [
+      "rubric/data/RaR-Science/rubric/train.parquet",
+      "rubric/data/RaR-Science/rubric/val.parquet",
+      "rubric/data/RaR-Science/rubric/test.parquet"
+    ],
+    "static_eval_source_split": "val"
+  },
+  "fixed_split": {
+    "script": "rubric/scripts/transfer/prepare_rarscience_eval_split.py",
+    "seed": 42,
+    "unique_questions_available_from_val": 2247,
+    "dev_questions": 200,
+    "test_questions": 500,
+    "dev_role": "dev200 local static diagnostics",
+    "test_role": "test500 frozen transfer baseline"
+  },
+  "paper_static_banks": {
+    "test500_reference_only": {
+      "run_stamp": "rarsci_refonly_seed42_test500",
+      "split": "test500",
+      "question_count": 500,
+      "bank_mode": "reference_only",
+      "candidates_per_question": [
+        "reference_answer"
+      ],
+      "pseudo_gold_judge": "openai/gpt-4o"
+    },
+    "dev200_multi_candidate": {
+      "run_stamp": "rarsci_static_dev_seed42_dev200",
+      "split": "dev200",
+      "question_count": 200,
+      "bank_mode": "multi_candidate",
+      "candidates_per_question": [
+        "reference_answer",
+        "Qwen3-4B-Base greedy",
+        "Qwen3-0.6B greedy",
+        "Qwen3-1.7B greedy",
+        "Qwen3-4B greedy",
+        "Qwen3-8B greedy"
+      ],
+      "local_anchor": "Qwen/Qwen3-8B"
+    }
+  },
+  "sha256_local_converted_parquet": {
+    "rubric/data/RaR-Science/rubric/train.parquet": "b38c3003bc995a4ec3ab9239d293d1b2df6353d75445e517c27fd9cfd70b667c",
+    "rubric/data/RaR-Science/rubric/val.parquet": "0319729b1c9c03ad5a9648a458797a47cb7dd649790c26072d57901ea594c0b8",
+    "rubric/data/RaR-Science/rubric/test.parquet": "06aadbd82cb4bc60f0ff742e47243fd74c04e4786d502be148651090524a0b9e"
+  },
+  "sha256_split_manifest_source": "ae25aee01840aa03f7a39e3577d6159666e447446738e6eb4f5abdc7120b7504"
+}

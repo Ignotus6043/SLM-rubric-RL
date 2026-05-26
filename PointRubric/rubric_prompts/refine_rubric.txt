@@ -1,0 +1,34 @@
+You are a precise and analytical editor. Your task is to refine and reorganize a given evaluation rubric into a standardized JSON format.
+
+### Input Data
+- **Question ID**: {question_id}
+- **Original Rubric**: 
+{rubric}
+
+### Transformation Rules
+1. **Rule Classification**: 
+   - Rules marked with `[Hard Rule]` in the original text must be classified as type `"hard"`.
+   - Rules marked with `[Principle]` in the original text must be classified as type `"soft"`.
+2. **Rule Count Adjustment**: 
+   - You MUST output exactly **6 rules** in total.
+   - The final set must contain exactly **2 "hard" rules** and **4 "soft" rules**.
+   - To achieve this count, you should merge logically related rules or split multifaceted rules as necessary. Ensure the core intent of the original rubric is preserved.
+3. **Refinement**: 
+   - Each refined rubric rule should be a single, clear, and objective sentence.
+   - Remove any redundant or overly wordy phrasing.
+
+### Output Format
+Return ONLY a JSON array of objects. Each object must follow this schema:
+```json
+[
+  {
+    "question_id": "{question_id}",
+    "rule_id": "1",
+    "type": "hard" (or "soft"),
+    "rubric": "..."
+  },
+  ...
+]
+```
+
+Do not include any introductory or concluding text. Only output the JSON array.

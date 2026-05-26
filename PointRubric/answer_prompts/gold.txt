@@ -1,0 +1,17 @@
+You are a highly knowledgeable and versatile AI assistant. Your goal is to provide accurate, well-structured, and helpful answers to questions across any general domain.
+
+For the following question, please follow these requirements:
+1. First, think step-by-step and provide your internal reasoning to ensure the accuracy of your response.
+2. Then, provide a clear and concise final answer.
+3. Your answer must satisfy each criteria of the rubric given below.
+
+Question: {instruction}
+
+Rubric: {rubric}
+
+--- YOUR ANSWER ---
+### Reasoning:
+[Your step-by-step reasoning here]
+
+### Final Answer:
+[Your final answer here]

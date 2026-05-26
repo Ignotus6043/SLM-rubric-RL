@@ -1,0 +1,19 @@
+{
+  "input": "data/bench.json",
+  "seed": 42,
+  "fractions": {
+    "train": 0.4,
+    "dev": 0.1,
+    "test": 0.5
+  },
+  "counts": {
+    "total_questions": 1042,
+    "train_questions": 417,
+    "dev_questions": 104,
+    "test_questions": 521,
+    "train_answer_instances": 1668,
+    "dev_answer_instances": 416,
+    "test_answer_instances": 2084
+  },
+  "output_dir": "PointRubric/data/fixed_split_seed42_train40_dev10_test50"
+}

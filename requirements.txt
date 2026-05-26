@@ -1,0 +1,14 @@
+# Minimal Python dependencies for the sanitized supplementary bundle.
+# Install CUDA-specific torch/transformers builds as appropriate for your platform.
+aiohttp
+datasets
+pandas
+torch
+transformers
+accelerate
+tqdm
+sentencepiece
+protobuf
+safetensors
+bitsandbytes
+scikit-learn
