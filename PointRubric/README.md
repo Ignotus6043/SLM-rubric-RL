@@ -37,7 +37,7 @@ For any judge that is tuned on PointRubric itself, first create the fixed held-o
 
 ```bash
 cd PointRubric
-python3 prepare_bench_fixed_split.py \
+python3 scripts/prepare_bench_fixed_split.py \
   --input data/bench.json \
   --output-dir data/fixed_split_seed42_train40_dev10_test50 \
   --seed 42 \
@@ -91,7 +91,7 @@ The frozen paper-ready static runs should include:
 Run local model judging with:
 
 ```bash
-python benchmark_eval.py \
+python scripts/benchmark_eval.py \
   --data-file data/bench.json \
   --prompt-file rubric_prompts/benchmark_judge.txt \
   --output-dir Results/static_eval

@@ -1,0 +1,39 @@
+model_name_or_path: Qwen/Qwen3-1.7B
+stage: sft
+do_train: true
+do_eval: true
+finetuning_type: lora
+lora_target: all
+
+dataset: sft_train_bench
+eval_dataset: sft_dev_bench
+dataset_dir: SFT
+template: qwen
+cutoff_len: 4096
+max_samples: null
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+output_dir: outputs/sft/qwen3-1.7b-lora
+logging_steps: 10
+logging_strategy: steps
+save_steps: 200
+save_strategy: steps
+eval_steps: 200
+eval_strategy: steps
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
+plot_loss: true
+overwrite_output_dir: true
+save_total_limit: 3
+
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+gradient_accumulation_steps: 32
+learning_rate: 2e-4
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+bf16: true
+report_to: none

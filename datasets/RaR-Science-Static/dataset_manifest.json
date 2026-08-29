@@ -4,7 +4,7 @@
   "source_dataset": {
     "name": "anisha2102/RaR-Science",
     "source": "Hugging Face Datasets",
-    "conversion_script_in_working_tree": "rubric/data/prepare_data.py",
+    "conversion_script_in_repository": "rubric/data/prepare_data.py",
     "local_converted_files_expected_by_scripts": [
       "rubric/data/RaR-Science/rubric/train.parquet",
       "rubric/data/RaR-Science/rubric/val.parquet",

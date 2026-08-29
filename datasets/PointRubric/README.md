@@ -6,7 +6,10 @@ This folder records the exact PointRubric/OpenRubricBench benchmark used by the 
 
 - Source dataset loader: `OpenRubrics/OpenRubric-v2`, split `train`
 - Fallback in the construction script: `OpenRubrics/OpenRubrics`
-- Construction script in the bundle: `PointRubric/scripts/prepare_bench_fixed_split.py`
+- Construction scripts in the bundle: `PointRubric/scripts/retrieve_data.py`,
+  `refine_rubric.py`, `generate_answers.py`, `grader.py`, and
+  `build_final_benchmark.py`
+- Frozen-split script: `PointRubric/scripts/prepare_bench_fixed_split.py`
 - Full released benchmark: `PointRubric/data/bench.json`
 - Fixed paper split: `PointRubric/data/fixed_split_seed42_train40_dev10_test50/`
 

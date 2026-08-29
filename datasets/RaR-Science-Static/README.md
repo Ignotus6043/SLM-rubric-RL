@@ -5,7 +5,7 @@ This folder records the exact RaR-Science static-transfer dataset protocol used 
 ## Source
 
 - Source dataset: `anisha2102/RaR-Science` from Hugging Face Datasets
-- Local conversion script in the working tree: `rubric/data/prepare_data.py`
+- Conversion script in this repository: `rubric/data/prepare_data.py`
 - Static evaluation source split: converted `val.parquet`
 - Fixed split script in the bundle: `rubric/scripts/transfer/prepare_rarscience_eval_split.py`
 

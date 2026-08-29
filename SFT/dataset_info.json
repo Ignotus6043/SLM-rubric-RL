@@ -1,0 +1,26 @@
+{
+  "sft_train_bench": {
+    "file_name": "data/sft_train.jsonl",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output"
+    }
+  },
+  "sft_dev_bench": {
+    "file_name": "data/sft_dev.jsonl",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output"
+    }
+  },
+  "sft_test_bench": {
+    "file_name": "data/sft_test.jsonl",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output"
+    }
+  }
+}

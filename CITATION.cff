@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the accompanying paper."
+title: "Small Language Models as Judges for Rubric-Based Reinforcement Learning"
+type: software
+authors:
+  - family-names: Xie
+    given-names: Fengyu
+  - family-names: Zhao
+    given-names: Yilun
+  - family-names: Chen
+    given-names: Bingsen
+  - family-names: Cohan
+    given-names: Arman
+  - family-names: Zhao
+    given-names: Chen
+repository-code: "https://github.com/Ignotus6043/SLM-rubric-RL"
+date-released: 2026-08-28

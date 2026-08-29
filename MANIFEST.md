@@ -1,50 +1,47 @@
-# Submission Bundle Manifest
+# Public Release Manifest
 
-- `MANIFEST.md`
-- `PointRubric/BENCHMARK_METRICS.md`
-- `PointRubric/README.md`
-- `PointRubric/answer_prompts/bad.txt`
-- `PointRubric/answer_prompts/gold.txt`
-- `PointRubric/answer_prompts/partial.txt`
-- `PointRubric/answer_prompts/plain.txt`
-- `PointRubric/answer_prompts/reason.txt`
-- `PointRubric/data/bench.json`
-- `PointRubric/data/fixed_split_seed42_train40_dev10_test50/dev.json`
-- `PointRubric/data/fixed_split_seed42_train40_dev10_test50/manifest.json`
-- `PointRubric/data/fixed_split_seed42_train40_dev10_test50/test.json`
-- `PointRubric/data/fixed_split_seed42_train40_dev10_test50/train.json`
-- `PointRubric/requirements.txt`
-- `PointRubric/rubric_prompts/benchmark_judge.txt`
-- `PointRubric/rubric_prompts/grader.txt`
-- `PointRubric/rubric_prompts/refine_rubric.txt`
-- `PointRubric/scripts/benchmark_eval.py`
-- `PointRubric/scripts/prepare_bench_fixed_split.py`
-- `PointRubric/scripts/summarize_paper_benchmark.py`
-- `README.md`
-- `SFT/eval.py`
-- `SFT/prepare_sft_data.py`
-- `datasets/PointRubric/README.md`
-- `datasets/PointRubric/dataset_manifest.json`
-- `datasets/PointRubric/question_ids.json`
-- `datasets/RaR-Science-Static/README.md`
-- `datasets/RaR-Science-Static/dataset_manifest.json`
-- `datasets/RaR-Science-Static/question_ids.json`
-- `requirements.txt`
-- `rubric/rubric_rl/__init__.py`
-- `rubric/rubric_rl/probe_reward_function.py`
-- `rubric/rubric_rl/probe_reward_server.py`
-- `rubric/rubric_rl/prompts.py`
-- `rubric/rubric_rl/rar_science_utils.py`
-- `rubric/scripts/bench/score_bench_hf_logprob.py`
-- `rubric/scripts/bench/score_bench_hf_probe.py`
-- `rubric/scripts/bench/score_bench_hf_probe_artifact.py`
-- `rubric/scripts/transfer/build_rarscience_response_bank.py`
-- `rubric/scripts/transfer/calibrate_rarscience_probe_artifact.py`
-- `rubric/scripts/transfer/diagnose_rarscience_parse_failures.py`
-- `rubric/scripts/transfer/evaluate_rarscience_judge_alignment.py`
-- `rubric/scripts/transfer/prepare_rarscience_eval_split.py`
-- `rubric/scripts/transfer/score_rarscience_response_bank_hf.py`
-- `rubric/scripts/transfer/score_rarscience_response_bank_hf_logprob.py`
-- `rubric/scripts/transfer/score_rarscience_response_bank_hf_probe.py`
-- `rubric/scripts/transfer/score_rarscience_response_bank_hf_probe_artifact.py`
-- `rubric/scripts/transfer/summarize_rarscience_static_suite.py`
+This repository is the organized public release for **Small Language Models as Judges for Rubric-Based Reinforcement Learning**.
+
+## Paper
+
+- `paper/Small_Language_Models_as_Judges_for_Rubric_Based_Reinforcement_Learning.pdf`: camera-ready PDF, rebuilt with all citations resolved.
+
+## PointRubric
+
+- `PointRubric/data/bench.json`: full 1,042-question benchmark.
+- `PointRubric/data/fixed_split_seed42_train40_dev10_test50/`: canonical question-level train/dev/test split.
+- `PointRubric/answer_prompts/` and `PointRubric/rubric_prompts/`: construction and evaluation prompts.
+- `PointRubric/scripts/`: API-based construction, final filtering, frozen splitting, evaluator, and summary scripts.
+- `datasets/PointRubric/`: provenance, counts, exact question IDs, and SHA-256 records.
+
+## RaR-Science and transfer
+
+- `rubric/data/prepare_data.py`: external dataset conversion to VERL parquet.
+- `rubric/scripts/transfer/`: response-bank, static readout, calibration, diagnostics, and alignment analysis.
+- `datasets/RaR-Science-Static/`: frozen dev/test question IDs and provenance.
+
+## Judges and RL
+
+- `rubric/scripts/bench/`: PointRubric Logprob and Probe evaluators plus human-audit utilities.
+- `rubric/rubric_rl/`: generative judge client/reward, Probe server/reward, prompt construction, and evaluation helpers.
+- `rubric/scripts/rl/preflight_reward_function.py`: fail-fast reward integration check.
+- `configs/paper_rl.json`: exact paper-level RaR-Science GRPO settings.
+
+## SFT
+
+- `SFT/prepare_sft_data.py`: fixed-split conversion.
+- `SFT/configs/`: portable Qwen3 0.6B, 1.7B, 4B, and 8B LLaMA-Factory configs.
+- `SFT/eval.py`: tuned-judge evaluation.
+- `SFT/dataset_info.json`: local dataset registration.
+
+## Environment and documentation
+
+- `README.md`: project overview and headline results.
+- `REPRODUCIBILITY.md`: environment, data, static evaluation, SFT, and RL guide.
+- `requirements.txt`: versions captured from the final RL environment.
+- `.env.example`: variable names only; no credential values.
+- `CITATION.cff`: citation metadata without private contact information.
+
+## Intentionally absent
+
+Credentials, populated environment files, private machine paths, Slurm account and email settings, raw API construction dumps, third-party model weights, checkpoints, Probe artifacts, logs, caches, W&B metadata, and generated result directories are excluded.
