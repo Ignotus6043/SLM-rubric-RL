@@ -574,6 +574,17 @@ def main() -> None:
     parser.add_argument("--max-prompt-length", type=int, default=DEFAULT_MAX_PROMPT_LENGTH)
     parser.add_argument("--max-new-tokens", type=int, default=DEFAULT_MAX_NEW_TOKENS)
     parser.add_argument("--models", nargs="*", default=None, help="Optional subset of model names.")
+    parser.add_argument(
+        "--split-dir",
+        default="",
+        help="Directory containing train.json, dev.json, and test.json.",
+    )
+    parser.add_argument(
+        "--eval-split",
+        choices=("all", "train", "dev", "test"),
+        default="all",
+        help="Question split to evaluate. Use --split-dir for train/dev/test.",
+    )
     args = parser.parse_args()
 
     random.seed(args.seed)
@@ -582,15 +593,24 @@ def main() -> None:
     cache_dir = setup_hf_cache()
     hf_token = os.environ.get("HF_TOKEN")
 
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    data_file = args.data_file if os.path.isabs(args.data_file) else os.path.join(base_dir, args.data_file)
-    prompt_file = args.prompt_file if os.path.isabs(args.prompt_file) else os.path.join(base_dir, args.prompt_file)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_dir = os.path.dirname(script_dir)
+
+    def resolve_input_path(path: str) -> str:
+        if os.path.isabs(path):
+            return path
+        if os.path.exists(path):
+            return os.path.abspath(path)
+        return os.path.join(project_dir, path)
+
+    data_file = resolve_input_path(args.data_file)
+    prompt_file = resolve_input_path(args.prompt_file)
 
     timestamp = datetime.now().strftime("%m%d_%H%M%S")
-    default_output_dir = os.path.join(base_dir, "Results", f"bench_eval_{timestamp}")
+    default_output_dir = os.path.join(project_dir, "Results", f"bench_eval_{timestamp}")
     output_dir = args.output_dir if args.output_dir else default_output_dir
     if not os.path.isabs(output_dir):
-        output_dir = os.path.join(base_dir, output_dir)
+        output_dir = os.path.abspath(output_dir)
     os.makedirs(output_dir, exist_ok=True)
 
     print(f"[INFO] Data file: {data_file}")
@@ -599,6 +619,21 @@ def main() -> None:
 
     with open(data_file, "r", encoding="utf-8") as f:
         bench_data = json.load(f)
+    if args.eval_split != "all":
+        if not args.split_dir:
+            raise ValueError("--split-dir is required when --eval-split is not 'all'.")
+        split_dir = resolve_input_path(args.split_dir)
+        split_path = os.path.join(split_dir, f"{args.eval_split}.json")
+        with open(split_path, "r", encoding="utf-8") as f:
+            split_rows = json.load(f)
+        split_ids = {str(row.get("question_id", "")) for row in split_rows}
+        if "" in split_ids:
+            raise ValueError(f"Split file contains an empty question_id: {split_path}")
+        bench_ids = {str(row.get("question_id", "")) for row in bench_data}
+        missing_ids = split_ids - bench_ids
+        if missing_ids:
+            raise ValueError(f"Split contains {len(missing_ids)} question IDs absent from the benchmark.")
+        bench_data = [row for row in bench_data if str(row.get("question_id", "")) in split_ids]
     with open(prompt_file, "r", encoding="utf-8") as f:
         prompt_template = f.read()
 
@@ -672,6 +707,8 @@ def main() -> None:
                     "output_dir": output_dir,
                     "models": model_names,
                     "failed_models": failed_models,
+                    "split_dir": args.split_dir,
+                    "eval_split": args.eval_split,
                     "max_samples": args.max_samples,
                     "seed": args.seed,
                     "num_workers": args.num_workers,
@@ -697,6 +734,8 @@ def main() -> None:
                     "output_dir": output_dir,
                     "models": model_names,
                     "failed_models": failed_models,
+                    "split_dir": args.split_dir,
+                    "eval_split": args.eval_split,
                     "max_samples": args.max_samples,
                     "seed": args.seed,
                     "num_workers": args.num_workers,

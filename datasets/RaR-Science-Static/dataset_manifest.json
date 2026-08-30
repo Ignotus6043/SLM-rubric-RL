@@ -1,57 +1,63 @@
 {
   "dataset_name": "RaR-Science-Static",
-  "role_in_paper": "External transfer/static evaluator benchmark using RaR-Science rubric data.",
+  "role_in_paper": "Primary fixed-bank science-domain rubric-judge evaluation dataset.",
+  "license": "CC-BY-4.0 for original project contributions; see THIRD_PARTY_DATA.md for upstream terms",
   "source_dataset": {
     "name": "anisha2102/RaR-Science",
-    "source": "Hugging Face Datasets",
-    "conversion_script_in_repository": "rubric/data/prepare_data.py",
-    "local_converted_files_expected_by_scripts": [
-      "rubric/data/RaR-Science/rubric/train.parquet",
-      "rubric/data/RaR-Science/rubric/val.parquet",
-      "rubric/data/RaR-Science/rubric/test.parquet"
-    ],
-    "static_eval_source_split": "val"
+    "url": "https://huggingface.co/datasets/anisha2102/RaR-Science",
+    "source_split": "val",
+    "conversion_script": "rubric/data/prepare_data.py",
+    "unique_questions_available_after_conversion": 2247,
+    "source_revision": "not recorded; converted parquet checksums are provided below"
   },
-  "fixed_split": {
-    "script": "rubric/scripts/transfer/prepare_rarscience_eval_split.py",
+  "bank_construction": {
     "seed": 42,
-    "unique_questions_available_from_val": 2247,
-    "dev_questions": 200,
-    "test_questions": 500,
-    "dev_role": "dev200 local static diagnostics",
-    "test_role": "test500 frozen transfer baseline"
-  },
-  "paper_static_banks": {
-    "test500_reference_only": {
-      "run_stamp": "rarsci_refonly_seed42_test500",
-      "split": "test500",
-      "question_count": 500,
-      "bank_mode": "reference_only",
-      "candidates_per_question": [
-        "reference_answer"
-      ],
-      "pseudo_gold_judge": "openai/gpt-4o"
-    },
-    "dev200_multi_candidate": {
-      "run_stamp": "rarsci_static_dev_seed42_dev200",
-      "split": "dev200",
-      "question_count": 200,
-      "bank_mode": "multi_candidate",
-      "candidates_per_question": [
-        "reference_answer",
-        "Qwen3-4B-Base greedy",
-        "Qwen3-0.6B greedy",
-        "Qwen3-1.7B greedy",
-        "Qwen3-4B greedy",
-        "Qwen3-8B greedy"
-      ],
-      "local_anchor": "Qwen/Qwen3-8B"
+    "questions": 1500,
+    "candidates_per_question": 2,
+    "candidate_ids": [
+      "reference_answer",
+      "qwen3_4b_greedy"
+    ],
+    "generator_model": "Qwen/Qwen3-4B",
+    "generator_decoding": {
+      "mode": "greedy",
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "thinking_disabled": true
     }
+  },
+  "reference_labels": {
+    "judge_model": "gpt-4o-2024-11-20",
+    "questions": 1500,
+    "candidates": 3000,
+    "criterion_decisions": 22550,
+    "parse_success_rate": 1.0,
+    "weight_handling": "absolute criterion weights"
+  },
+  "paper_split": {
+    "seed": 42,
+    "train_questions": 1000,
+    "dev_questions": 200,
+    "test_questions": 300,
+    "question_level_disjoint": true
+  },
+  "released_files": {
+    "reference_scored_bank": "datasets/RaR-Science-Static/reference_scored_bank.jsonl",
+    "question_ids": "datasets/RaR-Science-Static/question_ids.json",
+    "train_ids": "datasets/RaR-Science-Static/train_question_ids.txt",
+    "dev_ids": "datasets/RaR-Science-Static/dev_question_ids.txt",
+    "test_ids": "datasets/RaR-Science-Static/test_question_ids.txt"
+  },
+  "sha256": {
+    "datasets/RaR-Science-Static/reference_scored_bank.jsonl": "a7ec71aec5b44fcbfe3fb13a3ff3552b423918bc2dda48c5b457733fc2f9d78a",
+    "datasets/RaR-Science-Static/question_ids.json": "f499f8906c92dc2731da54dcc0452aaa7763b631948c8b31de88428d3c09dca7",
+    "datasets/RaR-Science-Static/train_question_ids.txt": "8d6d5a951d6a0a2eb20db2e5ed2d79c94bcfe543beafa6d7cabdbb8f20d5b50d",
+    "datasets/RaR-Science-Static/dev_question_ids.txt": "da4a43764b4cc2a5e91a6c7b21a368c5f7f84dc69043dc87f57d7e9e52cb38de",
+    "datasets/RaR-Science-Static/test_question_ids.txt": "f160653ccb0add7f0bee302a34d9fec66f1e2f4792f3b54449b6d8a3f827dcda"
   },
   "sha256_local_converted_parquet": {
     "rubric/data/RaR-Science/rubric/train.parquet": "b38c3003bc995a4ec3ab9239d293d1b2df6353d75445e517c27fd9cfd70b667c",
     "rubric/data/RaR-Science/rubric/val.parquet": "0319729b1c9c03ad5a9648a458797a47cb7dd649790c26072d57901ea594c0b8",
     "rubric/data/RaR-Science/rubric/test.parquet": "06aadbd82cb4bc60f0ff742e47243fd74c04e4786d502be148651090524a0b9e"
-  },
-  "sha256_split_manifest_source": "ae25aee01840aa03f7a39e3577d6159666e447446738e6eb4f5abdc7120b7504"
+  }
 }

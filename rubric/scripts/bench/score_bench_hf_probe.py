@@ -70,7 +70,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--label", default="")
     parser.add_argument("--train-questions", type=int, default=350)
     parser.add_argument("--dev-questions", type=int, default=50)
-    parser.add_argument("--eval-split", choices=("all", "heldout"), default="all")
+    parser.add_argument(
+        "--split-dir",
+        default="",
+        help="Directory containing train.json, dev.json, and test.json. Overrides count-based splitting.",
+    )
+    parser.add_argument("--eval-split", choices=("all", "heldout", "test"), default="heldout")
     parser.add_argument("--max-prompt-length", type=int, default=4096)
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
@@ -191,6 +196,41 @@ def split_question_ids(
     dev_ids = set(qids[train_questions : train_questions + dev_questions])
     heldout_ids = set(qids[train_questions + dev_questions :])
     return train_ids, dev_ids, heldout_ids
+
+
+def load_question_ids_from_split_dir(
+    split_dir: str,
+    available_question_ids: set[str],
+) -> tuple[set[str], set[str], set[str]]:
+    root = Path(split_dir)
+    split_ids: dict[str, set[str]] = {}
+    for split_name in ("train", "dev", "test"):
+        path = root / f"{split_name}.json"
+        if not path.is_file():
+            raise FileNotFoundError(f"Missing PointRubric split file: {path}")
+        rows = json.loads(path.read_text(encoding="utf-8"))
+        ids = {str(row.get("question_id", "")) for row in rows}
+        if "" in ids:
+            raise ValueError(f"PointRubric split contains an empty question_id: {path}")
+        split_ids[split_name] = ids
+
+    overlaps = (
+        (split_ids["train"] & split_ids["dev"])
+        | (split_ids["train"] & split_ids["test"])
+        | (split_ids["dev"] & split_ids["test"])
+    )
+    if overlaps:
+        raise ValueError(f"PointRubric split files are not question-disjoint: {root}")
+
+    released_ids = split_ids["train"] | split_ids["dev"] | split_ids["test"]
+    missing = released_ids - available_question_ids
+    extra = available_question_ids - released_ids
+    if missing or extra:
+        raise ValueError(
+            "PointRubric split does not match the benchmark question IDs: "
+            f"missing_from_benchmark={len(missing)} missing_from_split={len(extra)}"
+        )
+    return split_ids["train"], split_ids["dev"], split_ids["test"]
 
 
 def format_criterion(rule: dict[str, Any], rubric_format: str) -> str:
@@ -683,12 +723,25 @@ def main() -> int:
     if not samples:
         raise SystemExit("ERROR: no Bench samples found.")
 
-    train_ids, dev_ids, heldout_ids = split_question_ids(samples, args.train_questions, args.dev_questions, args.seed)
+    available_question_ids = {sample.question_id for sample in samples}
+    if args.split_dir:
+        train_ids, dev_ids, heldout_ids = load_question_ids_from_split_dir(
+            args.split_dir,
+            available_question_ids,
+        )
+    else:
+        train_ids, dev_ids, heldout_ids = split_question_ids(
+            samples,
+            args.train_questions,
+            args.dev_questions,
+            args.seed,
+        )
     eval_ids = {sample.question_id for sample in samples} if args.eval_split == "all" else heldout_ids
+    eval_split_label = "test" if args.eval_split in {"heldout", "test"} else "all"
 
     train_items, _ = build_criterion_items(samples, train_ids, "train", args.rubric_format)
     dev_items, _ = build_criterion_items(samples, dev_ids, "dev", args.rubric_format)
-    eval_items, eval_samples = build_criterion_items(samples, eval_ids, args.eval_split, args.rubric_format)
+    eval_items, eval_samples = build_criterion_items(samples, eval_ids, eval_split_label, args.rubric_format)
     if not train_items or not dev_items or not eval_items:
         raise SystemExit(
             f"ERROR: empty split. train_items={len(train_items)} dev_items={len(dev_items)} eval_items={len(eval_items)}"
@@ -815,9 +868,10 @@ def main() -> int:
             },
             "train_info": {
                 "bench_json": args.bench_json,
-                "train_questions": args.train_questions,
-                "dev_questions": args.dev_questions,
-                "eval_split": args.eval_split,
+                "split_dir": args.split_dir,
+                "train_questions": len(train_ids),
+                "dev_questions": len(dev_ids),
+                "eval_split": eval_split_label,
                 "seed": args.seed,
                 "probe_epochs": args.probe_epochs,
                 "probe_lr": args.probe_lr,
@@ -839,9 +893,10 @@ def main() -> int:
         "seconds_per_sample": safe_div(elapsed_seconds, len(eval_samples)),
         "judge_model": args.judge_model,
         "judge_backend": "hf_representation_probe",
-        "train_questions": args.train_questions,
-        "dev_questions": args.dev_questions,
-        "eval_split": args.eval_split,
+        "split_dir": args.split_dir,
+        "train_questions": len(train_ids),
+        "dev_questions": len(dev_ids),
+        "eval_split": eval_split_label,
         "rubric_format": args.rubric_format,
         "layers_requested": args.layers,
         "best_layer": int(best["layer"]),
@@ -862,9 +917,10 @@ def main() -> int:
                 "label": label,
                 "judge_model": args.judge_model,
                 "bench_json": args.bench_json,
-                "train_questions": args.train_questions,
-                "dev_questions": args.dev_questions,
-                "eval_split": args.eval_split,
+                "split_dir": args.split_dir,
+                "train_questions": len(train_ids),
+                "dev_questions": len(dev_ids),
+                "eval_split": eval_split_label,
                 "rubric_format": args.rubric_format,
                 "probe_classifier": args.probe_classifier,
                 "probe_hidden_dim": args.probe_hidden_dim,

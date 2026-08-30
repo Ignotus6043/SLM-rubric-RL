@@ -27,6 +27,7 @@ core.*
 *.bin
 *.parquet
 *.jsonl
+!datasets/RaR-Science-Static/reference_scored_bank.jsonl
 *.arrow
 *.npy
 *.npz
@@ -39,5 +40,6 @@ core.*
 hf_cache/
 logs/
 outputs/
+Results/
 checkpoints/
 wandb/

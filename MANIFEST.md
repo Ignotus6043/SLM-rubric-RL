@@ -18,7 +18,9 @@ This repository is the organized public release for **Small Language Models as J
 
 - `rubric/data/prepare_data.py`: external dataset conversion to VERL parquet.
 - `rubric/scripts/transfer/`: response-bank, static readout, calibration, diagnostics, and alignment analysis.
-- `datasets/RaR-Science-Static/`: frozen dev/test question IDs and provenance.
+- `rubric/scripts/transfer/build_rarscience_gpt_verdict_sft_splits.py`: exact seed-42 paper split and optional SFT-record construction from the released scored bank.
+- `datasets/RaR-Science-Static/reference_scored_bank.jsonl`: sanitized exact paper bank with 1,500 questions, 3,000 responses, and 22,550 GPT-4o criterion decisions.
+- `datasets/RaR-Science-Static/`: exact 1,000/200/300 train/dev/test split, provenance, and SHA-256 records.
 
 ## Judges and RL
 
@@ -39,9 +41,12 @@ This repository is the organized public release for **Small Language Models as J
 - `README.md`: project overview and headline results.
 - `REPRODUCIBILITY.md`: environment, data, static evaluation, SFT, and RL guide.
 - `requirements.txt`: versions captured from the final RL environment.
+- `scripts/verify_release.py`: checksum, split-integrity, label, and score validation for the committed datasets.
 - `.env.example`: variable names only; no credential values.
 - `CITATION.cff`: citation metadata without private contact information.
+- `LICENSE`: CC BY 4.0 license for original project contributions.
+- `THIRD_PARTY_DATA.md`: upstream dataset, model, API, and software terms that are not superseded by the project license.
 
 ## Intentionally absent
 
-Credentials, populated environment files, private machine paths, Slurm account and email settings, raw API construction dumps, third-party model weights, checkpoints, Probe artifacts, logs, caches, W&B metadata, and generated result directories are excluded.
+Credentials, populated environment files, private machine paths, Slurm account and email settings, raw judge prose and API timing, third-party model weights, checkpoints, Probe artifacts, logs, caches, W&B metadata, and generated result directories are excluded.

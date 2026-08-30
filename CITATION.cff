@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "If you use this code or data, please cite the accompanying paper."
 title: "Small Language Models as Judges for Rubric-Based Reinforcement Learning"
 type: software
+license: CC-BY-4.0
 authors:
   - family-names: Xie
     given-names: Fengyu

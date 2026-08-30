@@ -1,6 +1,7 @@
 {
   "dataset_name": "PointRubric / OpenRubricBench",
   "role_in_paper": "Pointwise rubric-judge benchmark for static and tuned evaluator experiments.",
+  "license": "CC-BY-4.0 for original project contributions; see THIRD_PARTY_DATA.md for upstream terms",
   "source_dataset": {
     "name": "OpenRubrics/OpenRubric-v2",
     "split": "train",

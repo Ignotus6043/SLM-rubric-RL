@@ -35,6 +35,7 @@ flatten_samples = HELPER.flatten_samples
 format_criterion = HELPER.format_criterion
 safe_div = HELPER.safe_div
 split_question_ids = HELPER.split_question_ids
+load_question_ids_from_split_dir = HELPER.load_question_ids_from_split_dir
 vector_to_yn = HELPER.vector_to_yn
 verdicts_to_score = HELPER.verdicts_to_score
 write_csv = HELPER.write_csv
@@ -69,7 +70,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--label", default="")
     parser.add_argument("--train-questions", type=int, default=350)
     parser.add_argument("--dev-questions", type=int, default=50)
-    parser.add_argument("--eval-split", choices=("all", "heldout"), default="heldout")
+    parser.add_argument(
+        "--split-dir",
+        default="",
+        help="Directory containing train.json, dev.json, and test.json. Overrides count-based splitting.",
+    )
+    parser.add_argument("--eval-split", choices=("all", "heldout", "test"), default="heldout")
     parser.add_argument("--max-prompt-length", type=int, default=4096)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--seed", type=int, default=42)
@@ -422,9 +428,22 @@ def main() -> int:
     if not samples:
         raise SystemExit("ERROR: no Bench samples found.")
 
-    train_ids, dev_ids, heldout_ids = split_question_ids(samples, args.train_questions, args.dev_questions, args.seed)
+    available_question_ids = {sample.question_id for sample in samples}
+    if args.split_dir:
+        train_ids, dev_ids, heldout_ids = load_question_ids_from_split_dir(
+            args.split_dir,
+            available_question_ids,
+        )
+    else:
+        train_ids, dev_ids, heldout_ids = split_question_ids(
+            samples,
+            args.train_questions,
+            args.dev_questions,
+            args.seed,
+        )
     eval_ids = {sample.question_id for sample in samples} if args.eval_split == "all" else heldout_ids
-    eval_items, eval_samples = build_criterion_items(samples, eval_ids, args.eval_split, args.rubric_format)
+    eval_split_label = "test" if args.eval_split in {"heldout", "test"} else "all"
+    eval_items, eval_samples = build_criterion_items(samples, eval_ids, eval_split_label, args.rubric_format)
     if not eval_items:
         raise SystemExit("ERROR: no eval items found.")
 
@@ -467,9 +486,10 @@ def main() -> int:
         "seconds_per_sample": safe_div(elapsed_seconds, len(eval_samples)),
         "judge_model": args.judge_model,
         "judge_backend": "hf_logprob",
-        "train_questions": args.train_questions,
-        "dev_questions": args.dev_questions,
-        "eval_split": args.eval_split,
+        "split_dir": args.split_dir,
+        "train_questions": len(train_ids),
+        "dev_questions": len(dev_ids),
+        "eval_split": eval_split_label,
         "rubric_format": args.rubric_format,
         "yes_threshold": args.yes_threshold,
         "score_mode": args.score_mode,

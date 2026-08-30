@@ -2,11 +2,11 @@
 
 This release separates three reproducibility targets:
 
-1. **Exact static data:** use the committed PointRubric files and frozen question-ID manifests.
+1. **Exact static data:** use the committed PointRubric benchmark and RaR-Science-Static response bank, labels, and question splits.
 2. **Judge and reward code:** rerun the Generative, Yes/No Logprob, and Probe implementations on compatible model checkpoints.
 3. **RL training:** connect the released reward function to VERL using the configuration recorded in `configs/paper_rl.json`.
 
-Generated API labels, downloaded model weights, Probe artifacts, and RL checkpoints are not committed. They may contain third-party content or are too large for Git; commands below produce them under ignored output directories.
+Downloaded model weights, Probe artifacts, and RL checkpoints are not committed. The exact sanitized RaR-Science-Static reference labels used in the paper are committed; new API-based construction runs remain non-deterministic and write to ignored output directories.
 
 ## 1. Environment
 
@@ -75,13 +75,16 @@ python PointRubric/scripts/build_final_benchmark.py \
 
 ## 4. Static judge evaluation
 
-Run the frozen Generative evaluator on the full PointRubric benchmark:
+Run a Generative judge on the paper's held-out PointRubric test split:
 
 ```bash
 python PointRubric/scripts/benchmark_eval.py \
   --data-file PointRubric/data/bench.json \
   --prompt-file PointRubric/rubric_prompts/benchmark_judge.txt \
-  --output-dir outputs/pointrubric/generative
+  --split-dir PointRubric/data/fixed_split_seed42_train40_dev10_test50 \
+  --eval-split test \
+  --models Qwen/Qwen3-1.7B \
+  --output-dir outputs/pointrubric/generative/qwen3_1p7b
 ```
 
 Run the Yes/No Logprob readout:
@@ -91,7 +94,8 @@ python rubric/scripts/bench/score_bench_hf_logprob.py \
   --bench-json PointRubric/data/bench.json \
   --judge-model Qwen/Qwen3-1.7B \
   --output-dir outputs/pointrubric/logprob \
-  --eval-split all --score-mode binary --seed 42
+  --split-dir PointRubric/data/fixed_split_seed42_train40_dev10_test50 \
+  --eval-split test --score-mode binary --seed 42
 ```
 
 Fit and evaluate a linear last-token Probe:
@@ -101,20 +105,36 @@ python rubric/scripts/bench/score_bench_hf_probe.py \
   --bench-json PointRubric/data/bench.json \
   --judge-model Qwen/Qwen3-1.7B \
   --output-dir outputs/pointrubric/probe \
-  --layers auto --probe-classifier linear --seed 42
+  --split-dir PointRubric/data/fixed_split_seed42_train40_dev10_test50 \
+  --eval-split test --layers auto --probe-classifier linear --seed 42
 ```
 
 The Probe command writes `probe_artifact.pt` plus predictions, metrics, and a run config. All output paths are ignored by Git.
 
-The RaR-Science-Static workflow is implemented under `rubric/scripts/transfer/`:
+The exact paper bank and GPT-4o criterion labels are committed at
+`datasets/RaR-Science-Static/reference_scored_bank.jsonl`; the disjoint
+1,000/200/300 question split is stored alongside it. The workflow that produced
+and consumes these artifacts is implemented under `rubric/scripts/transfer/`:
 
 1. Convert RaR-Science with `rubric/data/prepare_data.py`.
-2. Recreate the seed-42 dev/test split with `prepare_rarscience_eval_split.py`.
+2. Recreate the paper's 1,000/200/300 seed-42 split with `build_rarscience_gpt_verdict_sft_splits.py`.
 3. Build a fixed response bank with `build_rarscience_response_bank.py`.
 4. Score the same bank with the Generative, Logprob, or Probe entrypoints.
 5. Compare criterion labels using `evaluate_rarscience_judge_alignment.py`.
 
-Exact dev/test question IDs are committed under `datasets/RaR-Science-Static/`.
+To score the exact bank with the paper's Probe configuration, use the command in
+[`datasets/RaR-Science-Static/README.md`](datasets/RaR-Science-Static/README.md).
+Candidate judge outputs can be checked against the released reference labels
+with `evaluate_rarscience_judge_alignment.py`.
+
+The committed split can be reproduced from the released scored bank with:
+
+```bash
+python rubric/scripts/transfer/build_rarscience_gpt_verdict_sft_splits.py \
+  --gpt-scored-bank datasets/RaR-Science-Static/reference_scored_bank.jsonl \
+  --output-root outputs/rarscience/paper_split \
+  --train-sizes 1000 --dev-count 200 --heldout-count 300 --seed 42
+```
 
 ## 5. SFT baseline
 
@@ -183,6 +203,6 @@ Use `configs/paper_rl.json` as the authoritative paper settings record. It delib
 
 ## Release boundaries
 
-- **Committed:** source code, prompts, frozen public benchmark data, question IDs, checksums, portable configs, and the paper.
-- **Regenerated/downloaded:** third-party datasets, Hugging Face model weights, API annotations, response banks, Probe artifacts, checkpoints, and result files.
+- **Committed:** source code, prompts, PointRubric, the sanitized RaR-Science-Static paper bank and reference labels, frozen splits, checksums, portable configs, and the paper.
+- **Regenerated/downloaded:** source-dataset conversions, Hugging Face model weights, new API annotations or response banks, Probe artifacts, checkpoints, and result files.
 - **Never committed:** credentials, private paths, cluster account/email settings, environment dumps, logs, caches, and experiment-tracker metadata.

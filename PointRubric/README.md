@@ -21,19 +21,13 @@ This corresponds to:
 
 ## Protocol policy
 
-### Frozen / zero-shot / off-the-shelf judges
+### Paper evaluation protocol
 
-Use the full benchmark:
-
-- `data/bench.json`
-
-This is the main static evaluator-fidelity result.
-
-### PointRubric-tuned judges
-
+Table 3 evaluates every method on the same held-out `test.json` questions.
+Any trained or calibrated component uses only `train.json` and `dev.json`.
 Do **not** train on the full benchmark and then report on the same data.
 
-For any judge that is tuned on PointRubric itself, first create the fixed held-out split:
+Create the fixed paper split with:
 
 ```bash
 cd PointRubric
@@ -73,8 +67,9 @@ The SFT training configs must select the best checkpoint on the dev split:
 - `metric_for_best_model: eval_loss`
 - `greater_is_better: false`
 
-Final tuned-judge metrics must be reported on the held-out `test.json` split
-only. Do not report PointRubric-SFT models on the full benchmark.
+Final paper metrics must be reported on the held-out `test.json` split only.
+The complete `data/bench.json` remains available for explicitly labeled
+full-benchmark analyses of frozen, untuned judges.
 
 ## Main static judge set
 
@@ -88,11 +83,18 @@ The frozen paper-ready static runs should include:
 
 ## Canonical evaluation entrypoint
 
-Run local model judging with:
+From the repository root, evaluate a Generative judge on the paper's held-out
+test split with:
 
 ```bash
-python scripts/benchmark_eval.py \
-  --data-file data/bench.json \
-  --prompt-file rubric_prompts/benchmark_judge.txt \
-  --output-dir Results/static_eval
+python PointRubric/scripts/benchmark_eval.py \
+  --data-file PointRubric/data/bench.json \
+  --prompt-file PointRubric/rubric_prompts/benchmark_judge.txt \
+  --split-dir PointRubric/data/fixed_split_seed42_train40_dev10_test50 \
+  --eval-split test \
+  --models Qwen/Qwen3-1.7B \
+  --output-dir outputs/pointrubric/generative/qwen3_1p7b
 ```
+
+Omit `--split-dir` and use `--eval-split all` only for frozen, untuned judges
+that are meant to be evaluated on the full benchmark.

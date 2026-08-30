@@ -1,6 +1,6 @@
 # Small Language Models as Judges for Rubric-Based Reinforcement Learning
 
-This repository accompanies **“Small Language Models as Judges for Rubric-Based Reinforcement Learning.”** It releases the camera-ready paper, the PointRubric benchmark, frozen evaluation splits, static judge pipelines, and the reward code used to connect rubric judges to reinforcement learning.
+This repository accompanies **“Small Language Models as Judges for Rubric-Based Reinforcement Learning.”** It releases the camera-ready paper, the PointRubric benchmark, the exact RaR-Science-Static bank and reference labels, frozen evaluation splits, static judge pipelines, and the reward code used to connect rubric judges to reinforcement learning.
 
 ## Why this project
 
@@ -17,9 +17,10 @@ The camera-ready paper is in [`paper/`](paper/Small_Language_Models_as_Judges_fo
 ## Repository map
 
 - `PointRubric/`: benchmark data, prompt templates, fixed split, and benchmark utilities.
-- `datasets/`: provenance, checksums, and frozen question IDs for PointRubric and RaR-Science-Static.
+- `datasets/`: released static data, provenance, checksums, and frozen question IDs.
 - `rubric/data/prepare_data.py`: RaR-Science, RaR-Medicine, and HealthBench conversion to the VERL parquet schema.
-- `rubric/scripts/bench/`: Generative/Logprob/Probe evaluation on PointRubric.
+- `PointRubric/scripts/benchmark_eval.py`: Generative evaluation on PointRubric.
+- `rubric/scripts/bench/`: Yes/No Logprob and Probe evaluation on PointRubric, plus human-audit utilities.
 - `rubric/scripts/transfer/`: fixed-response-bank construction, judge scoring, calibration, and transfer analysis.
 - `rubric/rubric_rl/`: generative and Probe reward paths used with VERL.
 - `SFT/`: PointRubric SFT data preparation, evaluation, and portable LLaMA-Factory configs.
@@ -44,11 +45,17 @@ python PointRubric/scripts/prepare_bench_fixed_split.py \
   --seed 42 --train-frac 0.4 --dev-frac 0.1 --test-frac 0.5
 ```
 
-See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) before running GPU evaluation, SFT, or RL. Model weights, third-party training frameworks, generated labels, Probe artifacts, and checkpoints are intentionally not committed; the guide identifies how each is obtained or produced.
+See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) before running GPU evaluation, SFT, or RL. Model weights, third-party training frameworks, Probe artifacts, and checkpoints are intentionally not committed; the guide identifies how each is obtained or produced.
+
+Verify the committed dataset hashes, split integrity, reference labels, and aggregate scores with:
+
+```bash
+python scripts/verify_release.py
+```
 
 ## Data and release hygiene
 
-The frozen benchmark files include source and checksum records under `datasets/`. Model and dataset use remains subject to the licenses and terms of their original providers. Secrets must be supplied through the shell or an untracked `.env`; `.env.example` contains variable names only.
+The frozen benchmark files include source and checksum records under `datasets/`. Original project contributions are released under [CC BY 4.0](LICENSE); upstream data, model, and software terms are documented in [`THIRD_PARTY_DATA.md`](THIRD_PARTY_DATA.md). Secrets must be supplied through the shell or an untracked `.env`; `.env.example` contains variable names only.
 
 This release excludes API keys, environment files, private paths, Slurm account details, logs, W&B metadata, caches, model weights, and checkpoints.
 
